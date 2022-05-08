@@ -26,6 +26,28 @@ def unigram(totalWords, occurences):
     return round(total)
 
 
+def bigramPP(totalWords, bigram, unigram):
+    PerPlexSize = 0
+    line1 = "<START> HDTV . <STOP>"
+    total = 0
+    #log probability for our unique words in dataset
+    #totalWords is entire number of words in dataset including dupes
+    sentence = line1.split()
+    unigram["<START>"] = unigram["<STOP>"]
+    for i in range(1,len(sentence),1):
+        PerPlexSize+= 1
+        if((sentence[i], sentence[i-1]) in bigram):
+            total += np.log2(bigram[(sentence[i], sentence[i-1])] / unigram[sentence[i-1]])
+        else:
+            print("hi")
+            total += np.log2(unigram["<UNK>"]/ totalWords)
+
+    
+    total = ( -1 / PerPlexSize) * total
+    total = 2 ** total
+    return total
+
+
 def handleOOV(occurences):
     for key in list(occurences.keys()):
         if occurences[key] < 3 and key != '<UNK>' and key != '<STOP>':
