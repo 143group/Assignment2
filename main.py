@@ -27,9 +27,15 @@ def unigramPP(totalWords, occurences):
 
 
 def bigramPP(totalWords, bigram, unigram):
+
+    PerPlexSize = 0
+    line1 = "<START> HDTV . <STOP>"
+    total = 0
+
     PerPlexSize = 1
     line1 = "<START> HDTV . <STOP>"
     total = 1
+
     #log probability for our unique words in dataset
     #totalWords is entire number of words in dataset including dupes
     sentence = line1.split()
