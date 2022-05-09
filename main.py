@@ -1,19 +1,13 @@
-import pandas as pd
+# import pandas as pd
 import numpy as np
-import time
-import argparse
-import math
-
-
-
 
 def unigramPP(totalWords, occurences):
     file_path = "./A2-Data/1b_benchmark.train.tokens"
     f = open(file_path, "r", encoding="utf-8")
     PerPlexSize = 0
     total = 0
-    #log probability for our unique words in dataset
-    #totalWords is entire number of words in dataset including dupes
+    # log probability for our unique words in dataset
+    # totalWords is entire number of words in dataset including dupes
     for line in f:  
         sentence = list(line.split())
         sentence.append('<STOP>')
@@ -25,9 +19,8 @@ def unigramPP(totalWords, occurences):
                 total += np.log2(occurences["<UNK>"]/ totalWords)
 
 
-    total = ( -1 / PerPlexSize) * total
+    total = (-1 / PerPlexSize) * total
     total = 2 ** total
-
     return round(total)
 
 
@@ -37,8 +30,8 @@ def bigramPP(totalWords, bigram, unigram):
     line1 = "<START> HDTV . <STOP>"
     total = 0
 
-    #log probability for our unique words in dataset
-    #totalWords is entire number of words in dataset including dupes
+    # log probability for our unique words in dataset
+    # totalWords is entire number of words in dataset including dupes
     sentence = line1.split()
     unigram["<START>"] = unigram["<STOP>"]
     for i in range(1,len(sentence),1):
@@ -66,14 +59,14 @@ def makebigrams(f):
     for newline in f:  
         sentence = list(newline.split())
         for i in range(len(sentence)):
-             #check if the first P(word | <START> ) exists or not
+             # check if the first P(word | <START> ) exists or not
             if i == 0:
                 if (sentence[i], "<START>") in bigram:
                     bigram[(sentence[i], "<START>")] +=1
                 else:
                     bigram[(sentence[i], "<START>")] = 1
 
-            #if we are on the last word, we want to add P(STOP | word)
+            # if we are on the last word, we want to add P(STOP | word)
             elif i == len(sentence) - 1:
                 if (sentence[i], sentence[i - 1]) in bigram:
                     bigram[(sentence[i],sentence[i - 1])] +=1
@@ -85,7 +78,7 @@ def makebigrams(f):
                 else:
                     bigram[("<STOP>", sentence[i])] = 1
 
-            #if not in any of the two above scenarios, just add in regular bigram with curr and previous word
+            # if not in any of the two above scenarios, just add in regular bigram with curr and previous word
             else:
                 if (sentence[i], sentence[i - 1]) in bigram:
                     bigram[(sentence[i],sentence[i - 1])] += 1
@@ -101,13 +94,14 @@ def main():
     occurences["<STOP>"] = 0
     occurences["<UNK>"] = 0
     total = 0
-    f = open("/Users/jaypatel/Desktop/Assignment2/A2-Data/1b_benchmark.train.tokens", "r")
+    file_path = "./A2-Data/1b_benchmark.train.tokens"
+    f = open(file_path, "r", encoding="utf-8")
 
-    #iterate over each sentence
+    # iterate over each sentence
     for line in f:  
         occurences["<STOP>"] += 1
         totalWords += 1
-        #for each word in the sentence, check if it exists in dictionary 
+        # for each word in the sentence, check if it exists in dictionary 
         for word in line.split():
             totalWords += 1
             if word in occurences:
@@ -116,16 +110,16 @@ def main():
                 occurences[word] = 1
 
     
-    #remove OOV words
+    # remove OOV words
     occurences = handleOOV(occurences)
     
-    print(len(occurences))
+    print("Number of Occurances:", len(occurences))
 
-    print(unigramPP(totalWords,occurences))
+    print("Unigram Perplexity:", unigramPP(totalWords,occurences))
 
-    f = open("/Users/jaypatel/Desktop/Assignment2/A2-Data/1b_benchmark.train.tokens", "r")
+    f = open(file_path, "r", encoding="utf-8")
+
     bigram = dict()
-
     bigram = makebigrams(f)
 
     # i = 0
