@@ -24,26 +24,29 @@ def unigramPP(totalWords, occurences):
     return round(total)
 
 
-def bigramPP(totalWords, bigram, unigram):
+def bigramPP(totalWords, bigram, occurences):
 
+    file_path = "./A2-Data/1b_benchmark.train.tokens"
+    f = open(file_path, "r", encoding="utf-8")
     PerPlexSize = 0
-    line1 = "<START> HDTV . <STOP>"
-    total = 0
-
-    # log probability for our unique words in dataset
-    # totalWords is entire number of words in dataset including dupes
-    sentence = line1.split()
-    unigram["<START>"] = unigram["<STOP>"]
-    for i in range(1,len(sentence),1):
-        PerPlexSize+= 1
-        if((sentence[i], sentence[i-1]) in bigram):
-            total += np.log2(bigram[(sentence[i], sentence[i-1])] / unigram[sentence[i-1]])
-        else:
-            total += np.log2(unigram["<UNK>"]/ totalWords)
-
     
+    total = 0
+    occurences["<START>"] = occurences["<STOP>"]
+    #log probability for our unique words in dataset
+    #totalWords is entire number of words in dataset including dupes
+    for line in f:  
+        sentence = list(line.split())
+        sentence.append('<STOP>')
+        for i in range(0,len(sentence),1):
+            PerPlexSize+=1
+            if i == 0 and (sentence[i], "<START>") in bigram:
+                total += np.log10(bigram[(sentence[i], "<START>")]/ occurences["<START>"])
+
+            elif (sentence[i],sentence[i-1]) in bigram:
+                total += np.log10(bigram[(sentence[i], sentence[i-1])]/ occurences[sentence[i-1]])
+
     total = ( -1 / PerPlexSize) * total
-    total = 2 ** total
+    total = 10 ** total
     return total
 
 
@@ -62,7 +65,7 @@ def makebigrams(f):
              # check if the first P(word | <START> ) exists or not
             if i == 0:
                 if (sentence[i], "<START>") in bigram:
-                    bigram[(sentence[i], "<START>")] +=1
+                    bigram[(sentence[i], "<START>")] += 1
                 else:
                     bigram[(sentence[i], "<START>")] = 1
 
@@ -111,24 +114,30 @@ def main():
 
     
     # remove OOV words
-    occurences = handleOOV(occurences)
+    #occurences = handleOOV(occurences)
     
     print("Number of Occurances:", len(occurences))
 
-    print("Unigram Perplexity:", unigramPP(totalWords,occurences))
+    #print("Unigram Perplexity:", unigramPP(totalWords,occurences))
+    temp = dict()
+    temp = occurences
+    #remove OOV words
+    #temp = handleOOV(temp)
+    
+   # print(len(occurences))
+
+    
 
     f = open(file_path, "r", encoding="utf-8")
 
     bigram = dict()
     bigram = makebigrams(f)
 
-    # i = 0
-    # for keys in bigram.keys():
-    #     i = i + 1
-    #     print(keys)
-    #     print(bigram[keys])
-    #     if( i == 20):
-    #         return
+        
+   
+    print(bigramPP(totalWords, bigram, occurences))
+    
+
                 
 if __name__ == "__main__":
     main()
