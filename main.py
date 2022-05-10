@@ -25,14 +25,16 @@ def unigramPP(totalWords, occurences):
 
 
 def bigramPP(totalWords, bigram, unigram):
-
+    file_path = "./A2-Data/1b_benchmark.train.tokens"
+    f = open(file_path, "r", encoding="utf-8")
     PerPlexSize = 0
-    line1 = "<START> HDTV . <STOP>"
     total = 0
 
     # log probability for our unique words in dataset
     # totalWords is entire number of words in dataset including dupes
     sentence = line1.split()
+
+
     unigram["<START>"] = unigram["<STOP>"]
     for i in range(1,len(sentence),1):
         PerPlexSize+= 1
@@ -42,7 +44,7 @@ def bigramPP(totalWords, bigram, unigram):
             total += np.log2(unigram["<UNK>"]/ totalWords)
 
     
-    total = ( -1 / PerPlexSize) * total
+    total = (-1 / PerPlexSize) * total
     total = 2 ** total
     return total
 
@@ -111,11 +113,29 @@ def main():
 
     
     # remove OOV words
-    occurences = handleOOV(occurences)
-    
-    print("Number of Occurances:", len(occurences))
+    print("===== Preprocessed Data =====")
+    print("Unique Unigram Tokens:", len(occurences))
+    print("Unique Bigram Tokens:", )
+    print("Unique Trigram Tokens:", )
+    print("Total Words:", )
 
+
+    print("===== Train Data =====")
     print("Unigram Perplexity:", unigramPP(totalWords,occurences))
+    # print("Bigram Perplexity:", )
+    # print("Trigram Perplexity:", )
+
+    # print("===== Dev Data =====")
+    # print("Unigram Perplexity:", )
+    # print("Bigram Perplexity:", )
+    # print("Trigram Perplexity:", )
+
+    # print("===== Test Data =====")
+    # print("Unigram Perplexity:", )
+    # print("Bigram Perplexity:", )
+    # print("Trigram Perplexity:", )
+
+    occurences = handleOOV(occurences)
 
     f = open(file_path, "r", encoding="utf-8")
 
