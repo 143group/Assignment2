@@ -25,11 +25,12 @@ def trigramPP(filepath, trigrams, bigrams, occurances, totalWords):
     probability = 0
     file = open(filepath, "r", encoding="utf-8")
     for newline in file:
-        sentence = "<START> <START> " + newline + " <STOP>"
+        sentence = "<START> <START> " + newline
+        print(sentence)
         words = list(sentence.split())
         for i in range(2, len(words)):
             trigram = (words[i], words[i-2], words[i-1])
-            bigram = (words[i-2], words[i-1])
+            bigram = (words[i-1], words[i-2])
             if trigram in trigrams and bigram in bigrams:
                 # print(trigram, ": ", trigrams[trigram], bigram, ": ", bigrams[bigram])
                 probability += np.log(trigrams[trigram]/(bigrams[bigram] + len(occurances)))
