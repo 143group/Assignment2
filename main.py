@@ -22,29 +22,52 @@ def unigramPP(totalWords, occurences, file_path):
     total = 2 ** total
     return total
 
-
-def bigramPP(totalWords, bigram, occurences, file_path):
+def bigramPP(totalWords, bigram, unigram, file_path):
     f = open(file_path, "r", encoding="utf-8")
-    PerPlexSize = 0
-    
+    perPlexSize = 0 
     total = 0
-    occurences["<START>"] = occurences["<STOP>"]
-    #log probability for our unique words in dataset
-    #totalWords is entire number of words in dataset including dupes
+    unigram["<START>"] = unigram["<STOP>"]
+    # log probability for our unique words in dataset
+    # totalWords is entire number of words in dataset including dupes
+    prevWord = "<START>"
     for line in f:  
         sentence = list(line.split())
         sentence.append('<STOP>')
-        for i in range(0,len(sentence),1):
-            PerPlexSize+=1
-            if i == 0 and (sentence[i], "<START>") in bigram:
-                total += np.log10(bigram[(sentence[i], "<START>")]/ occurences["<START>"])
+        if prevWord == "<STOP>":
+            prevWord = "<START>"
+            
+        for word in sentence:
+            perPlexSize+=1
+            if (word, prevWord) in bigram:
+                total += np.log10(bigram[(word, prevWord)]/ unigram[prevWord])
+            prevWord = word 
 
-            elif (sentence[i],sentence[i-1]) in bigram:
-                total += np.log10(bigram[(sentence[i], sentence[i-1])]/ occurences[sentence[i-1]])
+    total = ( -1 / perPlexSize) * total
+    perplexity = 10 ** total
+    return perplexity
 
-    total = ( -1 / PerPlexSize) * total
-    total = 10 ** total
-    return total
+# def bigramPP(totalWords, bigram, occurences, file_path):
+#     f = open(file_path, "r", encoding="utf-8")
+#     PerPlexSize = 0
+    
+#     total = 0
+#     occurences["<START>"] = occurences["<STOP>"]
+#     #log probability for our unique words in dataset
+#     #totalWords is entire number of words in dataset including dupes
+#     for line in f:  
+#         sentence = list(line.split())
+#         sentence.append('<STOP>')
+#         for i in range(0,len(sentence),1):
+#             PerPlexSize+=1
+#             if i == 0 and (sentence[i], "<START>") in bigram:
+#                 total += np.log10(bigram[(sentence[i], "<START>")]/ occurences["<START>"])
+
+#             elif (sentence[i],sentence[i-1]) in bigram:
+#                 total += np.log10(bigram[(sentence[i], sentence[i-1])]/ occurences[sentence[i-1]])
+
+#     total = ( -1 / PerPlexSize) * total
+#     total = 10 ** total
+#     return total
 
 
 def handleOOV(occurences):
