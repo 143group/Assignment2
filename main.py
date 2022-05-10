@@ -1,17 +1,12 @@
+# import pandas as pd
 import numpy as np
-
-def handleOOV(occurences):
-    for key in list(occurences.keys()):
-        if occurences[key] < 3 and key != '<UNK>' and key != '<STOP>':
-            occurences.pop(key)
-            occurences["<UNK>"]+= 1
-    return occurences
 
 def unigramPP(totalWords, occurences):
     file_path = "./A2-Data/1b_benchmark.train.tokens"
     f = open(file_path, "r", encoding="utf-8")
     PerPlexSize = 0
     total = 0
+    
     # log probability for our unique words in dataset
     # totalWords is entire number of words in dataset including dupes
     for line in f:  
@@ -24,21 +19,23 @@ def unigramPP(totalWords, occurences):
             else:
                 total += np.log2(occurences["<UNK>"]/ totalWords)
 
+
     total = (-1 / PerPlexSize) * total
     total = 2 ** total
     return round(total)
 
 
 def bigramPP(totalWords, bigram, unigram):
-<<<<<<< Updated upstream
-
+    file_path = "./A2-Data/1b_benchmark.train.tokens"
+    f = open(file_path, "r", encoding="utf-8")
     PerPlexSize = 0
-    line1 = "<START> HDTV . <STOP>"
     total = 0
 
     # log probability for our unique words in dataset
     # totalWords is entire number of words in dataset including dupes
     sentence = line1.split()
+
+
     unigram["<START>"] = unigram["<STOP>"]
     for i in range(1,len(sentence),1):
         PerPlexSize+= 1
@@ -48,7 +45,7 @@ def bigramPP(totalWords, bigram, unigram):
             total += np.log2(unigram["<UNK>"]/ totalWords)
 
     
-    total = ( -1 / PerPlexSize) * total
+    total = (-1 / PerPlexSize) * total
     total = 2 ** total
     return total
 
@@ -59,30 +56,6 @@ def handleOOV(occurences):
             occurences.pop(key)
             occurences["<UNK>"]+= 1
     return occurences
-=======
-    file_path = "./A2-Data/1b_benchmark.train.tokens"
-    f = open(file_path, "r", encoding="utf-8")
-    perPlexSize = 0 
-    total = 0
-    unigram["<START>"] = unigram["<STOP>"]
-    # log probability for our unique words in dataset
-    # totalWords is entire number of words in dataset including dupes
-    prevWord = "<START>"
-    for line in f:  
-        sentence = list(line.split())
-        sentence.append('<STOP>')
-        for word in sentence:
-            perPlexSize+=1
-            if prevWord == "<STOP>":
-                prevWord = "<START>"
-            elif (word, prevWord) in bigram:
-                total += np.log10(bigram[(word, prevWord)]/ unigram[prevWord])
-            prevWord = word 
-
-    total = ( -1 / perPlexSize) * total
-    perplexity = 10 ** total
-    return perplexity
->>>>>>> Stashed changes
         
 def makebigrams(f):
     bigram = dict()
@@ -116,12 +89,86 @@ def makebigrams(f):
                     bigram[(sentence[i], sentence[i - 1])] = 1
     return bigram
 
+def makeBigram(filepath):
+    bigrams = {}
+    file = open(filepath, "r", encoding="utf-8")
+    for newline in file:
+        sentence = "<START> " + newline
+        words = list(sentence.split())
+        for i in range(1, len(words)):
+            bigram = (words[i], words[i-1])
+            bigrams[bigram] = 1 + bigrams.get(bigram, 0)
+    return bigrams
+
+def makeTrigram(filepath):
+    trigrams = {}
+    file = open(filepath, "r", encoding="utf-8")
+    for newline in file:
+        sentence = "<START> <START> " + newline
+        words = list(sentence.split())
+        for i in range(2, len(words)):
+            trigram = (words[i], words[i-2], words[i-1])
+            trigrams[trigram] = 1 + trigrams.get(trigram, 0)
+    return trigrams
+
+def trigramPP(filepath, trigrams, bigrams, occurances, totalWords):
+    probability = 0
+    file = open(filepath, "r", encoding="utf-8")
+    for newline in file:
+        sentence = "<START> <START> " + newline
+        words = list(sentence.split())
+        for i in range(2, len(words)):
+            trigram = (words[i], words[i-2], words[i-1])
+            bigram = (words[i-1], words[i-2])
+            if trigram in trigrams and bigram in bigrams:
+                # print(trigram, ": ", trigrams[trigram], bigram, ": ", bigrams[bigram])
+                probability += np.log(trigrams[trigram]/(bigrams[bigram]))
+
+    return np.exp(-(1/totalWords) * probability)
+
+def wordOccur(filepath):
+    file = open(filepath, "r", encoding="utf-8")
+    occurances = {}
+    totalWords = 0
+    
+    for newline in file:
+        sentence = list(newline.split())
+        for word in sentence:
+            totalWords += 1
+            occurances[word] = 1 + occurances.get(word, 0)
+    file.close()
+    return occurances, totalWords
+
+def replaceUNK(originpath, copypath, occurances):
+    replacement = ""
+    unknowns, stops = 0,0
+    file = open(originpath, "r", encoding="utf-8")
+    copy = open(copypath, "w", encoding="utf-8")
+    for newline in file:
+        for word in newline.split():
+            if word in occurances and occurances[word] < 3:
+                del occurances[word]
+                replacement += "<UNK> "
+                unknowns += 1
+            else:
+                replacement += word + " "
+        replacement += "<STOP>\n"
+        stops += 1
+    copy.seek(0)
+    copy.write(replacement)
+    copy.truncate()
+    file.close()   
+    copy.close
+    occurances["<UNK>"] = unknowns
+    occurances["<STOP>"] = stops
+    return unknowns, stops
 
 def main():
     occurences = dict()
     totalWords = 0
     occurences["<STOP>"] = 0
     occurences["<UNK>"] = 0
+    total = 0
     file_path = "./A2-Data/1b_benchmark.train.tokens"
     f = open(file_path, "r", encoding="utf-8")
 
@@ -139,33 +186,34 @@ def main():
 
     
     # remove OOV words
-<<<<<<< Updated upstream
-    occurences = handleOOV(occurences)
-    
-    print("Number of Occurances:", len(occurences))
+    print("===== Preprocessed Data =====")
+    print("Unique Unigram Tokens:", len(occurences))
+    print("Unique Bigram Tokens:", )
+    print("Unique Trigram Tokens:", )
+    print("Total Words:", )
 
+
+    print("===== Train Data =====")
     print("Unigram Perplexity:", unigramPP(totalWords,occurences))
-=======
-    # occurences = handleOOV(occurences)
-    
-    print("Number of Occurances:", len(occurences))
+    # print("Bigram Perplexity:", )
+    # print("Trigram Perplexity:", )
 
-    #print("Unigram Perplexity:", unigramPP(totalWords,occurences))
-    # temp = dict()
-    # temp = occurences
-    # remove OOV words
-    # temp = handleOOV(temp)
-    
-    # print(len(occurences))
+    # print("===== Dev Data =====")
+    # print("Unigram Perplexity:", )
+    # print("Bigram Perplexity:", )
+    # print("Trigram Perplexity:", )
 
-    
->>>>>>> Stashed changes
+    # print("===== Test Data =====")
+    # print("Unigram Perplexity:", )
+    # print("Bigram Perplexity:", )
+    # print("Trigram Perplexity:", )
+
+    occurences = handleOOV(occurences)
 
     f = open(file_path, "r", encoding="utf-8")
 
     bigram = dict()
     bigram = makebigrams(f)
-<<<<<<< Updated upstream
 
     # i = 0
     # for keys in bigram.keys():
@@ -175,11 +223,5 @@ def main():
     #     if( i == 20):
     #         return
                 
-=======
-   
-    print("Bigram Perplexity:", bigramPP(totalWords, bigram, occurences))
-    
-
->>>>>>> Stashed changes
 if __name__ == "__main__":
     main()
