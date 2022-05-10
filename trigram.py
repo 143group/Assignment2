@@ -4,18 +4,19 @@ def makeBigram(filepath):
     bigrams = {}
     file = open(filepath, "r", encoding="utf-8")
     for newline in file:
-        words = list(newline.split())
+        sentence = "<START> " + newline
+        words = list(sentence.split())
         for i in range(1, len(words)):
             bigram = (words[i], words[i-1])
             bigrams[bigram] = 1 + bigrams.get(bigram, 0)
-    
     return bigrams
 
 def makeTrigram(filepath):
     trigrams = {}
     file = open(filepath, "r", encoding="utf-8")
     for newline in file:
-        words = list(newline.split())
+        sentence = "<START> <START> " + newline
+        words = list(sentence.split())
         for i in range(2, len(words)):
             trigram = (words[i], words[i-2], words[i-1])
             trigrams[trigram] = 1 + trigrams.get(trigram, 0)
@@ -26,14 +27,13 @@ def trigramPP(filepath, trigrams, bigrams, occurances, totalWords):
     file = open(filepath, "r", encoding="utf-8")
     for newline in file:
         sentence = "<START> <START> " + newline
-        print(sentence)
         words = list(sentence.split())
         for i in range(2, len(words)):
             trigram = (words[i], words[i-2], words[i-1])
             bigram = (words[i-1], words[i-2])
             if trigram in trigrams and bigram in bigrams:
                 # print(trigram, ": ", trigrams[trigram], bigram, ": ", bigrams[bigram])
-                probability += np.log(trigrams[trigram]/(bigrams[bigram] + len(occurances)))
+                probability += np.log(trigrams[trigram]/(bigrams[bigram]))
 
     return np.exp(-(1/totalWords) * probability)
 
@@ -95,6 +95,10 @@ def main():
     print("[MAKING TRIGRAMS...]")
     trigrams = makeTrigram(train_path)
     print("[TRIGRAMS MADE.]\n")
+
+    tmp = list(trigrams.keys())
+    for i in range(10):
+        print(tmp[i])
 
     print("[CALCULATING TRAIN PERPLEXITY...]")
     trainPP= trigramPP(train_path, trigrams, bigrams, occurances, totalWords)
