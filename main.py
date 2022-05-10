@@ -121,14 +121,6 @@ def main():
 
     bigram = dict()
     bigram = makebigrams(f)
-
-    # i = 0
-    # for keys in bigram.keys():
-    #     i = i + 1
-    #     print(keys)
-    #     print(bigram[keys])
-    #     if( i == 20):
-    #         return
-                
+    
 if __name__ == "__main__":
     main()
