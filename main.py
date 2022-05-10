@@ -25,7 +25,6 @@ def unigramPP(totalWords, occurences):
 
     return round(total)
 
-
 def bigramPP(totalWords, bigram, unigram):
 
     PerPlexSize = 0
@@ -45,14 +44,12 @@ def bigramPP(totalWords, bigram, unigram):
         if((sentence[i], sentence[i-1]) in bigram):
             total += np.log2(bigram[(sentence[i], sentence[i-1])] / unigram[sentence[i-1]])
         else:
-            print("hi")
             total += np.log2(unigram["<UNK>"]/ totalWords)
 
     
     total = ( -1 / PerPlexSize) * total
     total = 2 ** total
     return total
-
 
 def handleOOV(occurences):
     for key in list(occurences.keys()):
@@ -92,15 +89,24 @@ def makebigrams(f):
                     bigram[(sentence[i], sentence[i - 1])] = 1
     return bigram
 
-
+def maketrigrams(f):
+    trigrams = dict()
+    for newline in f:
+        print(newline)
+        sentence = list(newline.split())
+        for i in range(len(sentence)-3):
+            trigram = (sentence[i],sentence[i+1],sentence[i+2])
+            trigrams[trigram] = 1 + trigrams.get(trigram, 0) 
+        
 
 def main():
     occurences = dict()
     totalWords = 0
     occurences["<STOP>"] = 0
     occurences["<UNK>"] = 0
-    total = 0
-    f = open("/Users/jaypatel/Desktop/Assignment2/A2-Data/1b_benchmark.train.tokens", "r")
+
+    file_path = "./A2-Data/1b_benchmark.train.tokens"
+    f = open(file_path, "r", encoding="utf-8")
 
     #iterate over each sentence
     for line in f:  
@@ -113,25 +119,14 @@ def main():
                 occurences[word] += 1
             else:
                 occurences[word] = 1
-
     
     #remove OOV words
     occurences = handleOOV(occurences)
        
     #print(unigram(totalWords, occurences))
-    f = open("/Users/jaypatel/Desktop/Assignment2/A2-Data/1b_benchmark.train.tokens", "r")
-    bigram = dict()
+    file_path = "./A2-Data/1b_benchmark.train.tokens"
+    f = open(file_path, "r", encoding="utf-8")
+    maketrigrams(f)
 
-    bigram = makebigrams(f)
-
-    print(bigramPP(totalWords, bigram, occurences))
-    # i = 0
-    # for keys in bigram.keys():
-    #     i = i + 1
-    #     print(keys)
-    #     print(bigram[keys])
-    #     if( i == 20):
-    #         return
-                
 if __name__ == "__main__":
     main()
