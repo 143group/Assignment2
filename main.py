@@ -22,67 +22,73 @@ def unigramPP(totalWords, occurences, file_path, alpha):
     total = 2 ** total
     return total
 
-def bigramPP(totalWords, bigram, unigram, file_path, alpha):
+# def bigramPP(totalWords, bigram, unigram, file_path, alpha):
+#     f = open(file_path, "r", encoding="utf-8")
+#     perPlexSize = 0 
+#     total = 0
+#     unigram["<START>"] = unigram["<STOP>"]
+#     # log probability for our unique words in dataset
+#     # totalWords is entire number of words in dataset including dupes
+#     prevWord = "<START>"
+#     for line in f:  
+#         sentence = list(line.split())
+#         sentence.append("<STOP>")
+#         if prevWord == "<STOP>":
+#             prevWord = "<START>"
+            
+#         for word in sentence:
+#             perPlexSize+=1
+#             if (word, prevWord) in bigram:
+#                 total += np.log10((bigram[(word, prevWord)] + alpha)/ (unigram[prevWord] + (len(unigram) * alpha )))
+#             prevWord = word 
+
+#     total = ( -1 / perPlexSize) * total
+#     perplexity = 10 ** total
+#     return perplexity
+
+def bigramPP(totalWords, bigram, occurences, file_path, alpha):
     f = open(file_path, "r", encoding="utf-8")
-    perPlexSize = 0 
+    PerPlexSize = 0
+    
     total = 0
-    unigram["<START>"] = unigram["<STOP>"]
-    # log probability for our unique words in dataset
-    # totalWords is entire number of words in dataset including dupes
-    prevWord = "<START>"
+    occurences["<START>"] = occurences["<STOP>"]
+    #log probability for our unique words in dataset
+    #totalWords is entire number of words in dataset including dupes
     for line in f:  
         sentence = list(line.split())
         sentence.append('<STOP>')
-        if prevWord == "<STOP>":
-            prevWord = "<START>"
-            
-        for word in sentence:
-            perPlexSize+=1
-            if (word, prevWord) in bigram:
-                total += np.log10((bigram[(word, prevWord)] + alpha)/ (unigram[prevWord] + len(unigram) * alpha ))
-            prevWord = word 
+        for i in range(0,len(sentence),1):
+            PerPlexSize+=1
+            if i == 0 and (sentence[i], "<START>") in bigram:
+                total += np.log10(bigram[(sentence[i], "<START>")]/ occurences["<START>"])
 
-    total = ( -1 / perPlexSize) * total
-    perplexity = 10 ** total
-    return perplexity
+            elif (sentence[i],sentence[i-1]) in bigram:
+                total += np.log10((bigram[(sentence[i], sentence[i-1])] + alpha)/ (occurences[sentence[i-1]] + (len(occurences) * alpha)))
 
-# def bigramPP(totalWords, bigram, occurences, file_path):
-#     f = open(file_path, "r", encoding="utf-8")
-#     PerPlexSize = 0
-    
-#     total = 0
-#     occurences["<START>"] = occurences["<STOP>"]
-#     #log probability for our unique words in dataset
-#     #totalWords is entire number of words in dataset including dupes
-#     for line in f:  
-#         sentence = list(line.split())
-#         sentence.append('<STOP>')
-#         for i in range(0,len(sentence),1):
-#             PerPlexSize+=1
-#             if i == 0 and (sentence[i], "<START>") in bigram:
-#                 total += np.log10(bigram[(sentence[i], "<START>")]/ occurences["<START>"])
-
-#             elif (sentence[i],sentence[i-1]) in bigram:
-#                 total += np.log10(bigram[(sentence[i], sentence[i-1])]/ occurences[sentence[i-1]])
-
-#     total = ( -1 / PerPlexSize) * total
-#     total = 10 ** total
-#     return total
+    total = ( -1 / PerPlexSize) * total
+    total = 10 ** total
+    return total
 
 
 
-def trigramPP(totalWords, trigrams, bigrams, file_path, alpha):
+def trigramPP(totalWords, trigrams, bigrams, file_path, alpha, unigrams):
     f = open(file_path, "r", encoding="utf-8")
     perPlexSize = 0
     total = 0
     for line in f:
-        sentence = list(("<START> <START> " + line + " <STOP>").split())
-        for i in range(2, len(sentence)):
-            perPlexSize += 1
-            trigram = (sentence[i], sentence[i-2], sentence[i-1])
-            bigram = (sentence[i-1], sentence[i-2])
-            if trigram in trigrams and bigram in bigrams:
-                total += np.log10((trigrams[trigram] + alpha )/( bigrams[bigram] + totalWords * alpha))
+        sentence = list(("<START> " + line + " <STOP>").split())
+        for i in range(1, len(sentence)):
+            if i == 1:
+                perPlexSize += 1
+                bigram = (sentence[i], sentence[i-1])
+                if bigram in bigrams:
+                    total += np.log10((bigrams[bigram] + alpha)/ (unigrams[sentence[i-1]] + (len(unigrams) * alpha)))
+            else:
+                perPlexSize += 1
+                trigram = (sentence[i], sentence[i-2], sentence[i-1])
+                bigram = (sentence[i-1], sentence[i-2])
+                if trigram in trigrams and bigram in bigrams:
+                    total += np.log10((trigrams[trigram] + alpha )/( bigrams[bigram] + (totalWords * alpha)))
     total = (-1 / perPlexSize) * total
     perplexity = 10 ** total
     return perplexity
@@ -131,15 +137,16 @@ def maketrigrams(f):
     for newline in f:  
         sentence = list(newline.split())
         for i in range(len(sentence)):
-            # check if the first P(word | <START>, <START> ) exists or not
             if i == 0:
-                trigram = (sentence[i], "<START>", "<START>")
+                continue
             # check if the second P(word | <START>, prevword ) exists or not
-            elif i == 1:
+            if i == 1:
                 trigram = (sentence[i], "<START>", sentence[i-1])
             # if we are on the last word, we want to add P(STOP | preprevword, prevword)
-            elif i == len(sentence):
+            elif i == len(sentence) - 1:
                 trigram = ("<STOP>", sentence[i-1], sentence[i])
+                trigrams[trigram] = 1 + trigrams.get(trigram, 0)
+                trigram = (sentence[i], sentence[i-2], sentence[i-1])
             # if not in any of the two above scenarios, just add in regular trigrams with curr and previous word
             else:
                 trigram = (sentence[i], sentence[i-2], sentence[i-1])
@@ -155,6 +162,8 @@ def main():
     file_path = "./A2-Data/1b_benchmark.train.tokens"
     f = open(file_path, "r", encoding="utf-8")
 
+
+    
     # iterate over each sentence
     for line in f:  
         occurences["<STOP>"] += 1
@@ -193,18 +202,18 @@ def main():
     print("===== Train Data =====")
     print("Unigram Perplexity:", unigramPP(totalWords,temp, "./A2-Data/1b_benchmark.train.tokens", 0))
     print("Bigram Perplexity:", bigramPP(totalWords, bigrams, original,"./A2-Data/1b_benchmark.train.tokens" , 0))
-    print("Trigram Perplexity:", trigramPP(totalWords, trigrams, bigrams, "./A2-Data/1b_benchmark.train.tokens", 0))
+    print("Trigram Perplexity:", trigramPP(totalWords, trigrams, bigrams, "./A2-Data/1b_benchmark.train.tokens", 0, original))
     
 
     print("===== Dev Data =====")
     print("Unigram Perplexity:", unigramPP(totalWords,temp, "./A2-Data/1b_benchmark.dev.tokens", 0) )
     print("Bigram Perplexity:", bigramPP(totalWords, bigrams, original,"./A2-Data/1b_benchmark.dev.tokens" , 0))
-    print("Trigram Perplexity:", trigramPP(totalWords, trigrams, bigrams, "./A2-Data/1b_benchmark.dev.tokens", 0))
+    print("Trigram Perplexity:", trigramPP(totalWords, trigrams, bigrams, "./A2-Data/1b_benchmark.dev.tokens", 0, original))
 
     print("===== Test Data =====")
     print("Unigram Perplexity:", unigramPP(totalWords,temp, "./A2-Data/1b_benchmark.test.tokens", 0) )
     print("Bigram Perplexity:", bigramPP(totalWords, bigrams, original,"./A2-Data/1b_benchmark.test.tokens", 0))
-    print("Trigram Perplexity:", trigramPP(totalWords, trigrams, bigrams,"./A2-Data/1b_benchmark.test.tokens", 0))
+    print("Trigram Perplexity:", trigramPP(totalWords, trigrams, bigrams,"./A2-Data/1b_benchmark.test.tokens", 0, original))
 
 if __name__ == "__main__":
     main()
