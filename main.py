@@ -22,29 +22,7 @@ def unigramPP(totalWords, occurences, file_path, alpha):
     total = 2 ** total
     return total
 
-# def bigramPP(totalWords, bigram, unigram, file_path, alpha):
-#     f = open(file_path, "r", encoding="utf-8")
-#     perPlexSize = 0 
-#     total = 0
-#     unigram["<START>"] = unigram["<STOP>"]
-#     # log probability for our unique words in dataset
-#     # totalWords is entire number of words in dataset including dupes
-#     prevWord = "<START>"
-#     for line in f:  
-#         sentence = list(line.split())
-#         sentence.append("<STOP>")
-#         if prevWord == "<STOP>":
-#             prevWord = "<START>"
-            
-#         for word in sentence:
-#             perPlexSize+=1
-#             if (word, prevWord) in bigram:
-#                 total += np.log10((bigram[(word, prevWord)] + alpha)/ (unigram[prevWord] + (len(unigram) * alpha )))
-#             prevWord = word 
 
-#     total = ( -1 / perPlexSize) * total
-#     perplexity = 10 ** total
-#     return perplexity
 
 def bigramPP(totalWords, bigram, occurences, file_path, alpha):
     f = open(file_path, "r", encoding="utf-8")
@@ -92,6 +70,61 @@ def trigramPP(totalWords, trigrams, bigrams, file_path, alpha, unigrams):
     total = (-1 / perPlexSize) * total
     perplexity = 10 ** total
     return perplexity
+
+def linearinterpolation(totalWords, trigrams, bigrams, file_path, unigrams, unigramsOriginal):
+    #f = open(file_path, "r", encoding="utf-8")
+    PerPlexSize = 0
+    bi = 0
+    uni = 0
+    tri = 0
+    total = 0
+    unigramsOriginal["<START>"] = unigramsOriginal["<STOP>"]
+
+    # for line in f:
+    #     sentence = list(("<START> " + line + " <STOP>").split())
+    sentence = "<START> HDTV . <STOP>"
+    sentence = list(sentence.split())
+    for i in range(1, len(sentence), 1):
+        if i == 1:
+            bi = 0
+            uni = 0
+            tri = 0
+            PerPlexSize += 1
+            bigram = (sentence[i], sentence[i-1])
+            unigram = sentence[i]
+            if bigram in bigrams:
+                print(bigrams[bigram])
+                bi = np.log10((bigrams[bigram])/ (unigramsOriginal[sentence[i-1]]))
+                tri = np.log10((bigrams[bigram])/ (unigramsOriginal[sentence[i-1]]))
+            if(unigram in unigrams):
+                uni = np.log10((unigrams[unigram])/ totalWords)
+            else:
+                uni = np.log10((unigrams["<UNK>"] )/ totalWords)
+            total += (0.1 * tri) + (0.3 * bi) + (0.6 * uni)
+        else:
+            bi = 0
+            uni = 0
+            tri = 0
+            PerPlexSize += 1
+            trigram = (sentence[i], sentence[i-2], sentence[i-1])
+            bigram = (sentence[i], sentence[i-1])
+            unigram = (sentence[i])
+            if bigram in bigrams:
+                bi = np.log10((bigrams[bigram])/ (unigramsOriginal[sentence[i-1]]))
+            if trigram in trigrams and (sentence[i-1], sentence[i-2]) in bigrams:
+                tri = np.log10((trigrams[trigram]) / bigrams[(sentence[i-1], sentence[i-2])])
+            if(unigram in unigrams):
+                uni = np.log10((unigrams[unigram])/ totalWords)
+            else:
+                uni = np.log10((unigrams["<UNK>"] )/ totalWords)
+            total += (0.1 * tri) + (0.3 * bi) + (0.6 * uni)
+
+    total = (-1 / 3) * total
+    perplexity = 10 ** total
+    return perplexity            
+
+
+
 
 def handleOOV(occurences):
     for key in list(occurences.keys()):
@@ -193,27 +226,29 @@ def main():
     trigrams = maketrigrams(f)
 
         
-    print("===== Preprocessed Data =====")
-    print("Unique Unigram Tokens:", len(temp))
-    print("Unique Bigram Tokens:", len(bigrams))
-    print("Unique Trigram Tokens:", len(trigrams))
-    print("Total Words:", totalWords)
+    # print("===== Preprocessed Data =====")
+    # print("Unique Unigram Tokens:", len(temp))
+    # print("Unique Bigram Tokens:", len(bigrams))
+    # print("Unique Trigram Tokens:", len(trigrams))
+    # print("Total Words:", totalWords)
 
-    print("===== Train Data =====")
-    print("Unigram Perplexity:", unigramPP(totalWords,temp, "./A2-Data/1b_benchmark.train.tokens", 0))
-    print("Bigram Perplexity:", bigramPP(totalWords, bigrams, original,"./A2-Data/1b_benchmark.train.tokens" , 0))
-    print("Trigram Perplexity:", trigramPP(totalWords, trigrams, bigrams, "./A2-Data/1b_benchmark.train.tokens", 0, original))
+    # print("===== Train Data =====")
+    # print("Unigram Perplexity:", unigramPP(totalWords,temp, "./A2-Data/1b_benchmark.train.tokens", 0))
+    # print("Bigram Perplexity:", bigramPP(totalWords, bigrams, original,"./A2-Data/1b_benchmark.train.tokens" , 0))
+    # print("Trigram Perplexity:", trigramPP(totalWords, trigrams, bigrams, "./A2-Data/1b_benchmark.train.tokens", 0, original))
     
 
-    print("===== Dev Data =====")
-    print("Unigram Perplexity:", unigramPP(totalWords,temp, "./A2-Data/1b_benchmark.dev.tokens", 0) )
-    print("Bigram Perplexity:", bigramPP(totalWords, bigrams, original,"./A2-Data/1b_benchmark.dev.tokens" , 0))
-    print("Trigram Perplexity:", trigramPP(totalWords, trigrams, bigrams, "./A2-Data/1b_benchmark.dev.tokens", 0, original))
+    # print("===== Dev Data =====")
+    # print("Unigram Perplexity:", unigramPP(totalWords,temp, "./A2-Data/1b_benchmark.dev.tokens", 0) )
+    # print("Bigram Perplexity:", bigramPP(totalWords, bigrams, original,"./A2-Data/1b_benchmark.dev.tokens" , 0))
+    # print("Trigram Perplexity:", trigramPP(totalWords, trigrams, bigrams, "./A2-Data/1b_benchmark.dev.tokens", 0, original))
 
-    print("===== Test Data =====")
-    print("Unigram Perplexity:", unigramPP(totalWords,temp, "./A2-Data/1b_benchmark.test.tokens", 0) )
-    print("Bigram Perplexity:", bigramPP(totalWords, bigrams, original,"./A2-Data/1b_benchmark.test.tokens", 0))
-    print("Trigram Perplexity:", trigramPP(totalWords, trigrams, bigrams,"./A2-Data/1b_benchmark.test.tokens", 0, original))
+    # print("===== Test Data =====")
+    # print("Unigram Perplexity:", unigramPP(totalWords,temp, "./A2-Data/1b_benchmark.test.tokens", 0) )
+    # print("Bigram Perplexity:", bigramPP(totalWords, bigrams, original,"./A2-Data/1b_benchmark.test.tokens", 0))
+    # print("Trigram Perplexity:", trigramPP(totalWords, trigrams, bigrams,"./A2-Data/1b_benchmark.test.tokens", 0, original))   
+    
 
+    print (linearinterpolation(totalWords, trigrams, bigrams, file_path, temp, original))
 if __name__ == "__main__":
     main()
