@@ -14,21 +14,17 @@ We then took the total summation of the log of the probability of the n-gram for
 **1. Report the perplexity scores of the unigram, bigram, and trigram language models for your training, development, and test sets. Briefly discuss the experimental results.**
 
 ```
-===== Preprocessed Data =====
-Unique Unigram Tokens: 26602
-Unique Bigram Tokens: 615644
-Unique Trigram Tokens: 1178733
-Total Words: 1622905
 ===== Train Data =====
 Unigram Perplexity: 983.4429002966516
 Bigram Perplexity: 74.12469927377359
-Trigram Perplexity: 5.197149726733204
+Trigram Perplexity: 5.204752412018896
 ===== Dev Data =====
 Unigram Perplexity: 900.1971583364631
 Bigram Perplexity: 19.99466904307459
-Trigram Perplexity: 1.9943620259470918
+Trigram Perplexity: 1.997263108432605
 ===== Test Data =====
 Unigram Perplexity: 904.3618500568698
 Bigram Perplexity: 20.09882880437638
-Trigram Perplexity: 1.0
+Trigram Perplexity: 2.0026239493746854
 ```
+
