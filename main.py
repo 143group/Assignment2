@@ -74,10 +74,7 @@ def trigramPP(totalWords, trigrams, bigrams, file_path, alpha, unigrams):
 
 def linearinterpolation(totalWords, trigrams, bigrams, file_path, unigrams):
     #f = open(file_path, "r", encoding="utf-8")
-    PerPlexSize = 0
-    bi = 0
-    uni = 0
-    tri = 0
+    perPlexSize = 0
     total = 0
 
     unigrams["<START>"] = unigrams["<STOP>"]
@@ -86,45 +83,28 @@ def linearinterpolation(totalWords, trigrams, bigrams, file_path, unigrams):
     sentence = "<START> HDTV . <STOP>"
     sentence = list(sentence.split())
     for i in range(1, len(sentence), 1):
-        if i == 1:
-            bi = 0
-            uni = 0
-            tri = 0
-            PerPlexSize += 1
-            bigram = (sentence[i], sentence[i-1])
-            unigram = sentence[i]
-            if bigram in bigrams and sentence[i-1] in unigrams:
-                bi = (bigrams[bigram]) / (unigrams[sentence[i-1]])
-                tri = (bigrams[bigram]) / (unigrams[sentence[i-1]])
-            if(unigram in unigrams):
-                uni = (unigrams[unigram]) / totalWords
-            else:
-                uni = (unigrams["<UNK>"] )/ totalWords
-            total += np.log10((0.6 * tri) + (0.3 * bi) + (0.1 * uni))
+        uni, bi, tri = 0, 0, 0 
+        perPlexSize += 1
+        unigram = sentence[i]
+        bigram = (sentence[i], sentence[i-1])
+
+        if unigram in unigrams:
+            uni = (unigrams[unigram]) / totalWords
         else:
-            bi = 0
-            uni = 0
-            tri = 0
-            PerPlexSize += 1
+            uni = unigrams["<UNK>"] / totalWords
+        if bigram in bigrams and sentence[i-1] in unigrams:
+            bi = (bigrams[bigram]) / (unigrams[sentence[i-1]]) 
+            tri = bi
+        if i > 1:
             trigram = (sentence[i], sentence[i-2], sentence[i-1])
-            bigram = (sentence[i], sentence[i-1])
-            unigram = (sentence[i])
-            if bigram in bigrams and sentence[i-1] in unigrams:
-                bi = (bigrams[bigram])/ (unigrams[sentence[i-1]])
             if trigram in trigrams and (sentence[i-1], sentence[i-2]) in bigrams:
                 tri = (trigrams[trigram]) / bigrams[(sentence[i-1], sentence[i-2])]
-            if(unigram in unigrams):
-                uni = (unigrams[unigram])/ totalWords
-            else:
-                uni = (unigrams["<UNK>"] )/ totalWords
-            total += np.log10((0.6 * tri) + (0.3 * bi) + (0.1 * uni))
+
+        total += np.log2((0.6 * tri) + (0.3 * bi) + (0.1 * uni))
 
     total = (-1 / 3) * total
-    perplexity = 10 ** total
+    perplexity = 2 ** total
     return perplexity            
-
-
-
 
 def handleOOV(occurences):
     for key in list(occurences.keys()):
@@ -191,12 +171,9 @@ def main():
     totalWords = 0
     occurences["<STOP>"] = 0
     occurences["<UNK>"] = 0
-    total = 0
     file_path = "./A2-Data/1b_benchmark.train.tokens"
     f = open(file_path, "r", encoding="utf-8")
 
-
-    
     # iterate over each sentence
     for line in f:  
         occurences["<STOP>"] += 1
@@ -208,8 +185,7 @@ def main():
                 occurences[word] += 1
             else:
                 occurences[word] = 1
-
-
+                
     original = occurences.copy()
     #remove OOV words
     temp = handleOOV(occurences)
