@@ -112,9 +112,9 @@ def linearinterpolation(totalWords, trigrams, bigrams, file_path, unigrams):
                 trigram = (sentence[i], sentence[i-2], sentence[i-1])
                 if trigram in trigrams and (sentence[i-1], sentence[i-2]) in bigrams:
                     tri = (trigrams[trigram]) / bigrams[(sentence[i-1], sentence[i-2])]
-            if uni > 0: uni = np.log2(uni) * 0.1
+            if uni > 0: uni = np.log2(uni) * 0.05
             if bi > 0: bi = np.log2(bi) * 0.3
-            if tri > 0: tri = np.log2(tri) * 0.6
+            if tri > 0: tri = np.log2(tri) * 0.65
             total += (uni + bi + tri)
     total = (-1 / totalWords) * total
     perplexity = 2 ** total
@@ -209,10 +209,10 @@ def maketrigrams(f, bigrams):
     return trigrams
  
 def getPerplexity(file_path, totalWords, trigrams, bigrams, original, temp, alpha):
-    print("Unigram Perplexity:", unigramPP(totalWords, temp, file_path, alpha))
-    print("Bigram Perplexity:", bigramPP(totalWords, bigrams, original, file_path, alpha))
-    print("Trigram Perplexity:", trigramPP(totalWords, trigrams, bigrams, file_path, alpha, original))
-    #print("Interpolation Perplexity:", linearinterpolation(totalWords, trigrams, bigrams, file_path, temp))
+    # print("Unigram Perplexity:", unigramPP(totalWords, temp, file_path, alpha))
+    # print("Bigram Perplexity:", bigramPP(totalWords, bigrams, original, file_path, alpha))
+    # print("Trigram Perplexity:", trigramPP(totalWords, trigrams, bigrams, file_path, alpha, original))
+    print("Interpolation Perplexity:", linearinterpolation(totalWords, trigrams, bigrams, file_path, temp))
 
 def main():
 
