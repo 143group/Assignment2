@@ -103,8 +103,6 @@ Trigram Perplexity: 12041.311117634672
 
 # Problem 3: Smoothing with linear interpolation
 
-λ
-
 **1. Report perplexity scores on training and development sets for various values of λ1, λ2, λ3. Report no more than 5 different sets of λ’s. In addition to this, report the training and development perplexity for the values λ1 = 0.1, λ2 = 0.3, λ3 = 0.6.**
 
 λ1 = 0.1, λ2 = 0.3, λ3 = 0.6
