@@ -35,15 +35,15 @@ Trigram Perplexity: inf
 ```
 ===== Train Data =====
 Unigram Perplexity: 977.5079364805702
-Bigram Perplexity: 1945.2127338217174
-Trigram Perplexity: 7212.6147593507685
+Bigram Perplexity: 1334.4325432826663
+Trigram Perplexity: 7212.499816031937
 ===== Dev Data =====
-Unigram Perplexity: 894.3902098296883
-Bigram Perplexity: 2381.4513500009934
-Trigram Perplexity: 12097.9265992677
+Unigram Perplexity: 894.3907520465264
+Bigram Perplexity: 2309.799385059791
+Trigram Perplexity: 12097.912929168193
 ===== Test Data =====
-Unigram Perplexity: 898.556197339652
-Bigram Perplexity: 2367.017041419381
+Unigram Perplexity: 898.5567420819071
+Bigram Perplexity: 2292.344750171113
 Trigram Perplexity: 12041.311117634672
 ```
 
@@ -54,15 +54,15 @@ For α = 2:
 ```
 ===== Train Data =====
 Unigram Perplexity: 979.9251974597048
-Bigram Perplexity: 2854.734167436604
-Trigram Perplexity: 10292.111205610467
+Bigram Perplexity: 1935.7095670324397
+Trigram Perplexity: 10292.013753150293
 ===== Dev Data =====
-Unigram Perplexity: 897.65904217758
-Bigram Perplexity: 3212.486036844813
-Trigram Perplexity: 14090.165899158821
+Unigram Perplexity: 897.6601133019157
+Bigram Perplexity: 3112.7486345941047
+Trigram Perplexity: 14090.152437942645
 ===== Test Data =====
-Unigram Perplexity: 901.7608784601948
-Bigram Perplexity: 3194.988400960591
+Unigram Perplexity: 901.7619544790897
+Bigram Perplexity: 3090.9996411543466
 Trigram Perplexity: 14032.515400181412
 ```
 
@@ -70,15 +70,15 @@ For α = 3:
 ```
 ===== Train Data =====
 Unigram Perplexity: 983.3398949724618
-Bigram Perplexity: 3534.676255300601
-Trigram Perplexity: 12155.695989413105
+Bigram Perplexity: 2385.296469990075
+Trigram Perplexity: 12155.613420887077
 ===== Dev Data =====
-Unigram Perplexity: 901.7037079050183
-Bigram Perplexity: 3830.638876108767
-Trigram Perplexity: 15272.07145764114
+Unigram Perplexity: 901.7052966189376
+Bigram Perplexity: 3710.1765289044642
+Trigram Perplexity: 15272.0588188918
 ===== Test Data =====
-Unigram Perplexity: 905.756864786023
-Bigram Perplexity: 3811.1433546887743
+Unigram Perplexity: 905.7584606411255
+Bigram Perplexity: 3685.511442763651
 Trigram Perplexity: 15214.076489832418
 ```
 
@@ -89,15 +89,15 @@ The best value of the hyperparameter seems to be when α = 1, as α begins to in
 ```
 ===== Train Data =====
 Unigram Perplexity: 977.5079364805702
-Bigram Perplexity: 1945.2127338217174
-Trigram Perplexity: 7212.6147593507685
+Bigram Perplexity: 1334.4325432826663
+Trigram Perplexity: 7212.499816031937
 ===== Dev Data =====
-Unigram Perplexity: 894.3902098296883
-Bigram Perplexity: 2381.4513500009934
-Trigram Perplexity: 12097.9265992677
+Unigram Perplexity: 894.3907520465264
+Bigram Perplexity: 2309.799385059791
+Trigram Perplexity: 12097.912929168193
 ===== Test Data =====
-Unigram Perplexity: 898.556197339652
-Bigram Perplexity: 2367.017041419381
+Unigram Perplexity: 898.5567420819071
+Bigram Perplexity: 2292.344750171113
 Trigram Perplexity: 12041.311117634672
 ```
 
@@ -108,33 +108,33 @@ Trigram Perplexity: 12041.311117634672
 λ1 = 0.1, λ2 = 0.3, λ3 = 0.6
 ```
 ===== Train Data =====
-Interpolation Perplexity: 22.258462641689402
+Interpolation Perplexity: 22.258379084771605
 ===== Dev Data =====
-Interpolation Perplexity: 1.8891254558212154
+Interpolation Perplexity: 8.200522182425297
 ```
 
 λ1 = 0.2, λ2 = 0.3, λ3 = 0.5
 ```
 ===== Train Data =====
-Interpolation Perplexity: 36.73158986194293
+Interpolation Perplexity: 36.73147495510786
 ===== Dev Data =====
-Interpolation Perplexity: 2.049248898124556
+Interpolation Perplexity: 14.817863336170353
 ```
 
 λ1 = 0.1, λ2 = 0.2, λ3 = 0.7
 ```
 ===== Train Data =====
-Interpolation Perplexity: 17.468689525258313
+Interpolation Perplexity: 17.468613019481996
 ===== Dev Data =====
-Interpolation Perplexity: 1.8781698503022324
+Interpolation Perplexity: 6.635756098720184
 ```
 
 λ1 = 0.05, λ2 = 0.3, λ3 = 0.65
 ```
 ===== Train Data =====
-Interpolation Perplexity: 17.326980404713794
+Interpolation Perplexity: 17.326909939922622
 ===== Dev Data =====
-Interpolation Perplexity: 1.8138185749204037
+Interpolation Perplexity: 6.100556716259455
 ```
 
 **2. Putting it all together, report perplexity on the test set, using the hyperparameters that you chose from the development set. Specify those hyperparameters.**
@@ -142,25 +142,25 @@ Interpolation Perplexity: 1.8138185749204037
 λ1 = 0.1, λ2 = 0.3, λ3 = 0.6
 ```
 ===== Test Data =====
-Interpolation Perplexity: 1.874223030707083
+Interpolation Perplexity: 8.231494227040557
 ```
 
 λ1 = 0.2, λ2 = 0.3, λ3 = 0.5
 ```
 ===== Test Data =====
-Interpolation Perplexity: 2.0308751320436174
+Interpolation Perplexity: 14.876599983296668
 ```
 
 λ1 = 0.1, λ2 = 0.2, λ3 = 0.7
 ```
 ===== Test Data =====
-Interpolation Perplexity: 1.8634346454479223
+Interpolation Perplexity: 6.659282598458705
 ```
 
 λ1 = 0.05, λ2 = 0.3, λ3 = 0.65
 ```
 ===== Test Data =====
-Interpolation Perplexity: 1.8004882624501728
+Interpolation Perplexity: 6.123026995749869
 ```
 
 **3. If you use half of the training data, would it increase or decrease the perplexity on previously unseen data? Why? Provide empirical experimental evidence if necessary.**
