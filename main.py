@@ -56,7 +56,6 @@ def bigramPP(totalWords, bigram, occurences, file_path, alpha):
                                     / 
                                     (26602 * alpha) )
 
-
     total = ( -1 / PerPlexSize) * total
     total = 10 ** total
     return total
@@ -212,9 +211,9 @@ def maketrigrams(f, bigrams):
     return trigrams
  
 def getPerplexity(file_path, totalWords, trigrams, bigrams, original, temp, alpha):
-    # print("Unigram Perplexity:", unigramPP(totalWords, temp, file_path, alpha))
-    # print("Bigram Perplexity:", bigramPP(totalWords, bigrams, temp, file_path, alpha))
-    # print("Trigram Perplexity:", trigramPP(totalWords, trigrams, bigrams, file_path, alpha, temp))
+    print("Unigram Perplexity:", unigramPP(totalWords, temp, file_path, alpha))
+    print("Bigram Perplexity:", bigramPP(totalWords, bigrams, temp, file_path, alpha))
+    print("Trigram Perplexity:", trigramPP(totalWords, trigrams, bigrams, file_path, alpha, temp))
     print("Interpolation Perplexity:", linearinterpolation(totalWords, trigrams, bigrams, file_path, temp))
 
 def main():
@@ -244,7 +243,8 @@ def main():
     
     f = open(file_path, "r", encoding="utf-8")
     bigrams = makebigrams(f)
-
+    #hardcode in missing value
+    bigrams[("<STOP>", "Theburg.tv.")] = 1
 
     f = open(file_path, "r", encoding="utf-8")
     trigrams = maketrigrams(f, bigrams)
