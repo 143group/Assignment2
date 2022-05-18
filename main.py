@@ -45,13 +45,13 @@ def bigramPP(totalWords, bigram, occurences, file_path, alpha):
                                         (occurences["<START>"] + (26602 * alpha)))
                 elif alpha == 0 and (sentence[i], "<START>") not in bigram:  
                     return inf                       
-            elif (sentence[i],sentence[i-1]) in bigram:
+            elif (sentence[i],sentence[i-1]) in bigram and sentence[i-1] in occurences:
                 total += np.log10( (bigram[(sentence[i], sentence[i-1])] + alpha)
                                     / 
                                     (occurences[sentence[i-1]] + (26602 * alpha) ) )
             elif alpha == 0 and (sentence[i],sentence[i-1]) not in bigram:
                 return inf
-            elif alpha > 0:
+            elif alpha > 0 and (sentence[i],sentence[i-1]) not in bigram:
                 total += np.log10( (alpha)
                                     / 
                                     (26602 * alpha) )
@@ -90,33 +90,36 @@ def linearinterpolation(totalWords, trigrams, bigrams, file_path, unigrams):
     f = open(file_path, "r", encoding="utf-8")
     perPlexSize = 0
     total = 0
+
     unigrams["<START>"] = unigrams["<STOP>"]
+    
     for line in f:
-        sentence = list(("<START> " + line + " <STOP>").split())
-        for i in range(1, len(sentence)):
+        sentence = list(("<START> <START> " + line + " <STOP>").split())
+        for i in range(2, len(sentence), 1):
             uni, bi, tri = 0, 0, 0 
             perPlexSize += 1
             unigram = sentence[i]
             bigram = (sentence[i], sentence[i-1])
-
+            trigram = (sentence[i], sentence[i-2], sentence[i-1])
             # get unigram, bigram, trigram perplexities
             if unigram in unigrams:
                 uni = (unigrams[unigram]) / totalWords
             else:
                 uni = unigrams["<UNK>"] / totalWords
 
-            if bigram in bigrams and sentence[i-1] in unigrams:
-                bi = (bigrams[bigram]) / (unigrams[sentence[i-1]]) 
-                tri = bi
-            if i > 1:
-                trigram = (sentence[i], sentence[i-2], sentence[i-1])
-                if trigram in trigrams and (sentence[i-1], sentence[i-2]) in bigrams:
-                    tri = (trigrams[trigram]) / bigrams[(sentence[i-1], sentence[i-2])]
-            if uni > 0: uni = np.log2(uni) * 0.05
+            if (bigram in bigrams) and (sentence[i-1] in unigrams):
+                bi = (bigrams[bigram]) / (unigrams[sentence[i-1]])
+                if i == 2:
+                    tri = bi 
+            
+            if (trigram in trigrams) and ((sentence[i-1], sentence[i-2]) in bigrams):
+                tri = (trigrams[trigram]) / (bigrams[(sentence[i-1], sentence[i-2])])
+            
+            if uni > 0: uni = np.log2(uni) * 0.1
             if bi > 0: bi = np.log2(bi) * 0.3
-            if tri > 0: tri = np.log2(tri) * 0.65
+            if tri> 0: tri = np.log2(tri) * 0.6
             total += (uni + bi + tri)
-    total = (-1 / totalWords) * total
+    total = (-1 / perPlexSize) * total
     perplexity = 2 ** total
     return perplexity          
 
@@ -185,9 +188,9 @@ def makebigrams(f):
 def maketrigrams(f, bigrams):
     trigrams = dict()
     for newline in f:  
-        sentence = list(newline.split())
-        for i in range(len(sentence)):
-            if i == 0:
+        sentence = list(("<START> <START> " + newline + " <STOP>").split())
+        for i in range(2, len(sentence), 1):
+            if i == 2:
                 trigram = (sentence[i], "<START>", "<START>")
                 if trigram in trigrams:
                     trigrams[trigram] += 1
@@ -195,10 +198,10 @@ def maketrigrams(f, bigrams):
                     trigrams[trigram] = bigrams[(sentence[i], "<START>")]
                 continue
             # check if the second P(word | <START>, prevword ) exists or not
-            if i == 1:
+            if i == 1 and i != len(sentence) - 1:
                 trigram = (sentence[i], "<START>", sentence[i-1])
             # if we are on the last word, we want to add P(STOP | preprevword, prevword)
-            elif i == len(sentence) - 1:
+            if i == len(sentence) - 1:
                 trigram = ("<STOP>", sentence[i-1], sentence[i])
                 trigrams[trigram] = 1 + trigrams.get(trigram, 0)
                 trigram = (sentence[i], sentence[i-2], sentence[i-1])
@@ -210,8 +213,8 @@ def maketrigrams(f, bigrams):
  
 def getPerplexity(file_path, totalWords, trigrams, bigrams, original, temp, alpha):
     # print("Unigram Perplexity:", unigramPP(totalWords, temp, file_path, alpha))
-    # print("Bigram Perplexity:", bigramPP(totalWords, bigrams, original, file_path, alpha))
-    # print("Trigram Perplexity:", trigramPP(totalWords, trigrams, bigrams, file_path, alpha, original))
+    # print("Bigram Perplexity:", bigramPP(totalWords, bigrams, temp, file_path, alpha))
+    # print("Trigram Perplexity:", trigramPP(totalWords, trigrams, bigrams, file_path, alpha, temp))
     print("Interpolation Perplexity:", linearinterpolation(totalWords, trigrams, bigrams, file_path, temp))
 
 def main():
