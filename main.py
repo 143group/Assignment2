@@ -251,10 +251,10 @@ def main():
     testPath = "./A2-Data/1b_benchmark.test.tokens"
 
     print("===== Train Data =====")
-    getPerplexity(trainPath, totalWords, trigrams, bigrams, original, temp, 1)
+    getPerplexity(trainPath, totalWords, trigrams, bigrams, original, temp, 0)
     print("===== Dev Data =====")
-    getPerplexity(devPath, totalWords, trigrams, bigrams, original, temp, 1)
+    getPerplexity(devPath, totalWords, trigrams, bigrams, original, temp, 0)
     print("===== Test Data =====")
-    getPerplexity(testPath, totalWords, trigrams, bigrams, original, temp, 1)
+    getPerplexity(testPath, totalWords, trigrams, bigrams, original, temp, 0)
 if __name__ == "__main__":
     main()
